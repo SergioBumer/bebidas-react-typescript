@@ -32,8 +32,6 @@ export const searchRecipe = async (id: string) => {
   const { data } = await axios(urlByName);
   const result = RecipeDetailsApiResponseSchema.safeParse(data?.drinks[0]);
   if (result.success) {
-    console.log(result.data);
-
     return result.data;
   }
 };

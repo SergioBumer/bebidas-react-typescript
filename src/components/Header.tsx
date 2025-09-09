@@ -1,70 +1,84 @@
-import { useEffect, useMemo, useState, type ChangeEvent, type FormEvent } from 'react'
-import { NavLink, useLocation } from 'react-router-dom'
-import { useAppStore } from '../stores/useAppStore'
+import {
+  useEffect,
+  useMemo,
+  useState,
+  type ChangeEvent,
+  type FormEvent,
+} from "react";
+import { NavLink, useLocation } from "react-router-dom";
+import { useAppStore } from "../stores/useAppStore";
 export default function Header() {
-  const { pathname } = useLocation()
-  //console.log(pathname)
+  const { pathname } = useLocation();
 
-  const isHome = useMemo(() => pathname == '/', [pathname])
+  const isHome = useMemo(() => pathname == "/", [pathname]);
 
-  const fetchCategories = useAppStore(state => state.fetchCategories)
-  const categories = useAppStore(state => state.categories)
-  const searchRecipes = useAppStore(state => state.searchRecipes)
-  const recipes = useAppStore(state => state.recipes)
+  const fetchCategories = useAppStore((state) => state.fetchCategories);
+  const categories = useAppStore((state) => state.categories);
+  const searchRecipes = useAppStore((state) => state.searchRecipes);
+  const showNotification = useAppStore((state) => state.showNotification);
+  const closeNotification = useAppStore((state) => state.closeNotification);
+
+  const [searchFilters, setSearchFilters] = useState({
+    ingredient: "",
+    category: "",
+  });
 
   useEffect(() => {
-    console.log(recipes);
-    
-  }, [recipes])
-  const [searchFilters, setSearchFilters] = useState({ ingredient: '', category: '' })
+    fetchCategories();
+  }, []);
 
-  useEffect(() => {
-    fetchCategories()
-  }, [])
-
-  const handleChange = (e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>) => {
+  const handleChange = (
+    e: ChangeEvent<HTMLInputElement> | ChangeEvent<HTMLSelectElement>
+  ) => {
     setSearchFilters({
       ...searchFilters,
-      [e.target.name]: e.target.value
-    })
-  }
+      [e.target.name]: e.target.value,
+    });
+  };
 
   const handleSubmit = (e: FormEvent<HTMLFormElement>) => {
     e.preventDefault();
 
-    if(Object.values(searchFilters).includes('')) {
-      console.log(searchFilters);
-      return
-      
+    if (Object.values(searchFilters).includes("")) {
+      showNotification({
+        text: "Todos los campos son obligatorios",
+        error: true,
+      });
+      return;
     }
+    closeNotification()
     //Consultar recetas
-    searchRecipes(searchFilters)
-  }
+    searchRecipes(searchFilters);
+  };
 
   return (
-    <header className={isHome ? "bg-[url('/bg.jpg')] bg-center bg-cover" : 'bg-slate-800'}>
-      <div className='mx-auto container px-5 py-16 '>
-        <div className='flex justify-between items-center'>
-          <div className=''>
-            <img className='w-32' src='/logo.svg' alt='Logotipo' />
+    <header
+      className={
+        isHome ? "bg-[url('/bg.jpg')] bg-center bg-cover" : "bg-slate-800"
+      }
+    >
+      <div className="mx-auto container px-5 py-16 ">
+        <div className="flex justify-between items-center">
+          <div className="">
+            <img className="w-32" src="/logo.svg" alt="Logotipo" />
           </div>
-          <nav className='flex gap-4'>
+          <nav className="flex gap-4">
             <NavLink
-              to='/'
+              to="/"
               className={({ isActive }) =>
                 isActive
-                  ? 'text-orange-500 uppercase font-bold'
-                  : 'text-white uppercase font-bold'
+                  ? "text-orange-500 uppercase font-bold"
+                  : "text-white uppercase font-bold"
               }
             >
               Inicio
             </NavLink>
             <NavLink
-              to='/favorites'
+              to="/favorites"
               className={({ isActive }) =>
                 isActive
-                  ? 'text-orange-500 uppercase font-bold'
-                  : 'text-white uppercase font-bold'
+                  ? "text-orange-500 uppercase font-bold"
+                  : "text-white uppercase font-bold"
               }
             >
               Favoritos
@@ -72,44 +86,62 @@ export default function Header() {
           </nav>
         </div>
         {isHome && (
-          <form action='' className='md:w-1/2 2xl:w-1/ bg-orange-400 p-10 my-32 rounded-lg shadow space-y-6' onSubmit={handleSubmit}>
-            <div className='space-y-4'>
+          <form
+            action=""
+            className="md:w-1/2 2xl:w-1/ bg-orange-400 p-10 my-32 rounded-lg shadow space-y-6"
+            onSubmit={handleSubmit}
+          >
+            <div className="space-y-4">
               <label
-                htmlFor='ingredient'
-                className='block text-white uppercase font-extrabold text-lg'
+                htmlFor="ingredient"
+                className="block text-white uppercase font-extrabold text-lg"
               >
                 Nombre o Ingrediente
               </label>
               <input
-                className='p-3 w-full rounded-lg focus:outline-none bg-gray-300'
-                type='text'
-                name='ingredient'
-                id='ingredient'
-                placeholder='Nombre o Ingrediente. Ej. Vodka, Ron, etc.'
+                className="p-3 w-full rounded-lg focus:outline-none bg-gray-300"
+                type="text"
+                name="ingredient"
+                id="ingredient"
+                placeholder="Nombre o Ingrediente. Ej. Vodka, Ron, etc."
                 onChange={handleChange}
                 value={searchFilters.ingredient}
               />
             </div>
 
-            <div className='space-y-4'>
+            <div className="space-y-4">
               <label
-                htmlFor='category'
-                className='block text-white uppercase font-extrabold text-lg'
+                htmlFor="category"
+                className="block text-white uppercase font-extrabold text-lg"
               >
                 Categoría
               </label>
-              <select onChange={handleChange} name="category" id="category" className='p-3 w-full rounded-lg focus:outline-none bg-gray-300'>
+              <select
+                onChange={handleChange}
+                name="category"
+                id="category"
+                className="p-3 w-full rounded-lg focus:outline-none bg-gray-300"
+              >
                 <option value="">-- Seleccione --</option>
-                {categories?.drinks.map(category => (
-                  <option key={category.strCategory} value={category.strCategory}>{category.strCategory}</option>
+                {categories?.drinks.map((category) => (
+                  <option
+                    key={category.strCategory}
+                    value={category.strCategory}
+                  >
+                    {category.strCategory}
+                  </option>
                 ))}
               </select>
             </div>
 
-            <input type="submit" value="Buscar" className='cursor-pointer bg-orange-800 hover:bg-orange-900 text-white uppercase font-extrabold w-full p-2 rounded-lg' />
+            <input
+              type="submit"
+              value="Buscar"
+              className="cursor-pointer bg-orange-800 hover:bg-orange-900 text-white uppercase font-extrabold w-full p-2 rounded-lg"
+            />
           </form>
         )}
       </div>
     </header>
-  )
+  );
 }
